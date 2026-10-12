@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bitcoin Withdrawal Demo</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#eef3f8;
+}
+.page{
+  display:none;
+  max-width:430px;
+  min-height:100vh;
+  margin:auto;
+  padding:20px;
+  background:#fff;
+}
+.page.active{display:block}
+h1{text-align:center;color:#f7931a}
+.card{
+  background:#f7f9fc;
+  border:1px solid #ddd;
+  border-radius:14px;
+  padding:18px;
+  margin:15px 0;
+}
+input{
+  width:100%;
+  padding:14px;
+  margin:8px 0;
+  border:1px solid #ccc;
+  border-radius:9px;
+  font-size:16px;
+}
+button{
+  width:100%;
+  padding:14px;
+  margin-top:10px;
+  border:0;
+  border-radius:9px;
+  background:#1769e0;
+  color:#fff;
+  font-size:16px;
+}
+.link{
+  text-align:center;
+  color:#1769e0;
+  font-weight:bold;
+  cursor:pointer;
+}
+.message{text-align:center;min-height:20px}
+.error{color:#d93025}
+.success{color:green;font-weight:bold}
+.balance{
+  background:#1769e0;
+  color:#fff;
+  padding:20px;
+  border-radius:14px;
+  text-align:center;
+}
+.balance h2{color:#fff;font-size:34px;margin:5px}
+.reward{color:green;font-weight:bold}
+.task{
+  padding:15px;
+  background:#f1f5f9;
+  border-radius:10px;
+}
+.account{
+  background:#eef3f8;
+  padding:18px;
+  border-radius:12px;
+  text-align:center;
+}
+.account-number{
+  font-size:26px;
+  font-weight:bold;
+  color:#1769e0;
+  letter-spacing:2px;
+}
+.warning{
+  color:#a15c00;
+  font-size:13px;
+  line-height:1.5;
+}
+.nav{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:5px;
+  position:sticky;
+  bottom:0;
+  background:#fff;
+  padding:8px;
+  border-top:1px solid #ddd;
+}
+.nav button{font-size:12px;margin:0;padding:10px 3px}
+.logout{background:#d93025}
+</style>
+</head>
+
+<body>
+
+<!-- SIGN UP -->
+<div id="signupPage" class="page active">
+  <h1>₿ Bitcoin Withdrawal</h1>
+
+  <div class="card">
+    <h2>Sign Up</h2>
+
+    <input id="signupName" type="text" placeholder="Enter your name">
+    <input id="signupPassword" type="password" placeholder="Create password">
+
+    <button type="button" onclick="signUp()">Sign Up</button>
+
+    <p id="signupMessage" class="message"></p>
+
+    <p class="link" onclick="showPage('loginPage')">
+      Already have an account? Login
+    </p>
+  </div>
+</div>
+
+
+<!-- LOGIN -->
+<div id="loginPage" class="page">
+  <h1>₿ Bitcoin Withdrawal</h1>
+
+  <div class="card">
+    <h2>Login</h2>
+
+    <input id="loginName" type="text" placeholder="Enter your name">
+    <input id="loginPassword" type="password" placeholder="Enter your password">
+
+    <button type="button" onclick="login()">Login</button>
+
+    <p id="loginMessage" class="message"></p>
+
+    <p class="link" onclick="showPage('signupPage')">
+      Don't have an account? Sign Up
+    </p>
+  </div>
+</div>
+
+
+<!-- HOME -->
+<div id="homePage" class="page">
+  <h1>₿ Bitcoin Withdrawal</h1>
+
+  <p>Welcome, <strong id="userNameDisplay">User</strong></p>
+
+  <div class="balance">
+    <p>Balance</p>
+    <h2 id="balance">$0.00</h2>
+  </div>
+
+  <div class="card">
+    <h2>📋 Task</h2>
+
+    <div class="task">
+      <h3>Daily Task</h3>
+      <p>Complete today's task to receive the demo reward.</p>
+      <p class="reward">Reward: $5.00</p>
+      <p id="taskStatus">Task available.</p>
+
+      <button type="button" onclick="completeTask()">
+        Complete Task
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🎁 Rewards</h2>
+    <p>Completed Tasks:
+      <strong id="completedTasks">0</strong>
+    </p>
+    <p>Total Rewards:
+      <strong id="totalRewards">$0.00</strong>
+    </p>
+  </div>
+
+  <div class="nav">
+    <button type="button" onclick="showPage('homePage')">🏠<br>Home</button>
+    <button type="button" onclick="showPage('taskPage')">📋<br>Task</button>
+    <button type="button" onclick="showPage('depositPage')">💳<br>Deposit</button>
+    <button type="button" class="logout" onclick="logout()">🚪<br>Logout</button>
+  </div>
+</div>
+
+
+<!-- TASK PAGE -->
+<div id="taskPage" class="page">
+  <h1>📋 Tasks</h1>
+
+  <div class="card">
+    <h2>Daily Task</h2>
+    <p>Complete the task to receive the demo reward.</p>
+    <p class="reward">Reward: $5.00</p>
+
+    <p id="taskStatus2">Task available.</p>
+
+    <button type="button" onclick="completeTask()">
+      Complete Task
+    </button>
+  </div>
+
+  <button type="button" onclick="showPage('homePage')">
+    ← Back Home
+  </button>
+</div>
+
+
+<!-- DEPOSIT -->
+<div id="depositPage" class="page">
+  <h1>💳 Deposit</h1>
+
+  <div class="card">
+    <h2>Transfer Money</h2>
+
+    <p>
+      If you choose to make a transfer, use the payment details
+      provided below.
+    </p>
+
+    <div class="account">
+      <p><strong>Bank</strong></p>
+      <h2>Opay</h2>
+
+      <p><strong>Account Number</strong></p>
+      <p class="account-number">8158811462</p>
+
+      <p><strong>Account Name</strong></p>
+      <h3>Chilota</h3>
+    </div>
+
+    <button type="button" onclick="copyAccount()">
+      📋 Copy Account Number
+    </button>
+
+    <p id="copyMessage" class="message"></p>
+
+    <p class="warning">
+      This is a demo website. A transfer made outside the website
+      is not automatically verified, and this page does not
+      automatically add money to the displayed balance.
+      Confirm the recipient details before sending any real money.
+    </p>
+  </div>
+
+  <button type="button" onclick="showPage('homePage')">
+    ← Back Home
+  </button>
+</div>
+
+
+<script>
+"use strict";
+
+/* ---------------------------
+   APP DATA
+--------------------------- */
+
+let balance = Number(localStorage.getItem("demoBalance")) || 0;
+let completedTasks = Number(localStorage.getItem("demoTasks")) || 0;
+let totalRewards = Number(localStorage.getItem("demoRewards")) || 0;
+
+let taskCompleted =
+  localStorage.getItem("demoTaskCompleted") === "true";
+
+
+/* ---------------------------
+   PAGE NAVIGATION
+--------------------------- */
+
+function showPage(pageId){
+
+  document.querySelectorAll(".page").forEach(function(page){
+    page.classList.remove("active");
+  });
+
+  const page = document.getElementById(pageId);
+
+  if(page){
+    page.classList.add("active");
+  }
+
+  updateScreen();
+}
+
+
+/* ---------------------------
+   SIGN UP
+--------------------------- */
+
+function signUp(){
+
+  const name =
+    document.getElementById("signupName").value.trim();
+
+  const password =
+    document.getElementById("signupPassword").value;
+
+  const message =
+    document.getElementById("signupMessage");
+
+
+  if(name === "" || password === ""){
+
+    message.textContent =
+      "Please enter your name and password.";
+
+    message.className =
+      "message error";
+
+    return;
+  }
+
+
+  if(password.length < 6){
+
+    message.textContent =
+      "Password must be at least 6 characters.";
+
+    message.className =
+      "message error";
+
+    return;
+  }
+
+
+  localStorage.setItem("demoName", name);
+  localStorage.setItem("demoPassword", password);
+
+  balance = 0;
+  completedTasks = 0;
+  totalRewards = 0;
+
+  localStorage.setItem("demoBalance", "0");
+  localStorage.setItem("demoTasks", "0");
+  localStorage.setItem("demoRewards", "0");
+  localStorage.removeItem("demoTaskDate");
+  localStorage.removeItem("demoTaskCompleted");
+
+
+  message.textContent =
+    "✅ Sign up successful. Please login.";
+
+  message.className =
+    "message success";
+
+
+  setTimeout(function(){
+
+    document.getElementById("loginName").value = name;
+    document.getElementById("loginPassword").value = "";
+
+    document.getElementById("signupName").value = "";
+    document.getElementById("signupPassword").value = "";
+
+    showPage("loginPage");
+
+  },700);
+}
+
+
+/* ---------------------------
+   LOGIN
+--------------------------- */
+
+function login(){
+
+  const name =
+    document.getElementById("loginName").value.trim();
+
+  const password =
+    document.getElementById("loginPassword").value;
+
+  const savedName =
+    localStorage.getItem("demoName");
+
+  const savedPassword =
+    localStorage.getItem("demoPassword");
+
+  const message =
+    document.getElementById("loginMessage");
+
+
+  if(!savedName || !savedPassword){
+
+    message.textContent =
+      "No account found. Please sign up first.";
+
+    message.className =
+      "message error";
+
+    return;
+  }
+
+
+  if(name === savedName && password === savedPassword){
+
+    localStorage.setItem("demoLoggedIn", "true");
+
+    message.textContent =
+      "✅ Login successful.";
+
+    message.className =
+      "message success";
+
+
+    setTimeout(function(){
+      loadUser();
+      showPage("homePage");
+    },500);
+
+  }else{
+
+    message.textContent =
+      "❌ Incorrect name or password.";
+
+    message.className =
+      "message error";
+  }
+}
+
+
+/* ---------------------------
+   LOAD USER
+--------------------------- */
+
+function loadUser(){
+
+  const name =
+    localStorage.getItem("demoName");
+
+  if(name){
+    document.getElementById(
+      "userNameDisplay"
+    ).textContent = name;
+  }
+}
+
+
+/* ---------------------------
+   DAILY TASK
+--------------------------- */
+
+function completeTask(){
+
+  const today =
+    new Date().toLocaleDateString("en-CA");
+
+  const savedDate =
+    localStorage.getItem("demoTaskDate");
+
+
+  if(savedDate !== today){
+
+    taskCompleted = false;
+
+    localStorage.setItem(
+      "demoTaskDate",
+      today
+    );
+  }
+
+
+  if(taskCompleted){
+
+    updateTaskStatus();
+
+    return;
+  }
+
+
+  taskCompleted = true;
+
+  balance += 5;
+  completedTasks += 1;
+  totalRewards += 5;
+
+
+  localStorage.setItem(
+    "demoTaskCompleted",
+    "true"
+  );
+
+  saveData();
+  updateScreen();
+  updateTaskStatus();
+}
+
+
+/* ---------------------------
+   TASK STATUS
+--------------------------- */
+
+function updateTaskStatus(){
+
+  const text =
+    taskCompleted
+      ? "✅ Today's task has been completed."
+      : "🟢 Today's task is available.";
+
+  document.getElementById(
+    "taskStatus"
+  ).textContent = text;
+
+  document.getElementById(
+    "taskStatus2"
+  ).textContent = text;
+}
+
+
+/* ---------------------------
+   SAVE DATA
+--------------------------- */
+
+function saveData(){
+
+  localStorage.setItem(
+    "demoBalance",
+    balance
+  );
+
+  localStorage.setItem(
+    "demoTasks",
+    completedTasks
+  );
+
+  localStorage.setItem(
+    "demoRewards",
+    totalRewards
+  );
+}
+
+
+/* ---------------------------
+   UPDATE SCREEN
+--------------------------- */
+
+function updateScreen(){
+
+  document.getElementById(
+    "balance"
+  ).textContent =
+    "$" + balance.toFixed(2);
+
+  document.getElementById(
+    "completedTasks"
+  ).textContent =
+    completedTasks;
+
+  document.getElementById(
+    "totalRewards"
+  ).textContent =
+    "$" + totalRewards.toFixed(2);
+
+  updateTaskStatus();
+}
+
+
+/* ---------------------------
+   COPY ACCOUNT NUMBER
+--------------------------- */
+
+function copyAccount(){
+
+  const number = "8158811462";
+  const message =
+    document.getElementById("copyMessage");
+
+
+  if(navigator.clipboard){
+
+    navigator.clipboard.writeText(number)
+      .then(function(){
+
+        message.textContent =
+          "✅ Account number copied.";
+
+        message.className =
+          "message success";
+
+      })
+      .catch(function(){
+
+        message.textContent =
+          "Please copy the account number manually.";
+
+        message.className =
+          "message error";
+      });
+
+  }else{
+
+    message.textContent =
+      "Please copy the account number manually.";
+
+    message.className =
+      "message error";
+  }
+}
+
+
+/* ---------------------------
+   LOGOUT
+--------------------------- */
+
+function logout(){
+
+  localStorage.setItem(
+    "demoLoggedIn",
+    "false"
+  );
+
+  document.getElementById(
+    "loginName"
+  ).value = "";
+
+  document.getElementById(
+    "loginPassword"
+  ).value = "";
+
+  document.getElementById(
+    "loginMessage"
+  ).textContent = "";
+
+  showPage("loginPage");
+}
+
+
+/* ---------------------------
+   START APP
+--------------------------- */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  function(){
+
+    const name =
+      localStorage.getItem("demoName");
+
+    const loggedIn =
+      localStorage.getItem(
+        "demoLoggedIn"
+      ) === "true";
+
+
+    if(loggedIn && name){
+
+      loadUser();
+      showPage("homePage");
+
+    }else if(name){
+
+      document.getElementById(
+        "loginName"
+      ).value = name;
+
+      showPage("loginPage");
+
+    }else{
+
+      showPage("signupPage");
+    }
+
+
+    updateScreen();
+  }
+);
+</script>
+
+</body>
+  </html>
+  
